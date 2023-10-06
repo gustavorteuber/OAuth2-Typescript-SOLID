@@ -1,0 +1,39 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "./generated/client"
+  }
+  
+  datasource db {
+    provider = "sqlite"
+    url      = "file:./dev.db"
+  }
+  
+  model User {
+    id       Int      @id @default(autoincrement())
+    username String   @unique
+    password String   
+    accessTokens AccessToken[]
+  }
+  
+  model OAuthClient {
+    id           Int      @id @default(autoincrement())
+    clientId     String   @unique
+    clientSecret String
+    accessTokens  AccessToken[] 
+  }
+  
+  model AccessToken {
+    id           Int      @id @default(autoincrement())
+    token        String   @unique
+    userId       Int
+    clientId     Int
+    revoked      Boolean  @default(false)
+    refreshToken String?
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    expiresAt    DateTime
+    user         User     @relation(fields: [userId], references: [id])
+    client       OAuthClient @relation(fields: [clientId], references: [id])
+  }
+  
+  
